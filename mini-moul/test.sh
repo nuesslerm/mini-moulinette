@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source config.sh
+SCRIPT_DIR="$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)"
+CURR_DIR="$(pwd -P)/mini-moul"
+
+source "$SCRIPT_DIR/config.sh"
 
 #utils
 index=0
@@ -15,22 +18,35 @@ checks=0
 passed=0
 marks=0
 questions=0
-dirname_found=0
 break_score=0
 score_false=0
 available_assignments=""
 result=""
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 dirname_found=0
 
 main()
 {
     start_time=$(date +%s)
-    #print_collected_files
-    for dir in ./tests/* ; do
+    
+    # Debug: Print the current directory and test directory path
+    echo "Current directory: $CURR_DIR"
+    echo "Looking in: $CURR_DIR/tests/"
+    
+    # Check if tests directory exists
+    if [ ! -d "$CURR_DIR/tests" ]; then
+        printf "${RED}Error: tests directory not found in $CURR_DIR${DEFAULT}\n"
+        exit 1
+    fi
+    
+    # List contents of tests directory
+    echo "Contents of tests directory:"
+    ls -la "$CURR_DIR/tests"
+    
+    for dir in "$CURR_DIR"/tests/*; do
         dirname="$(basename "$dir")"
+        echo "Found directory: $dirname"
         available_assignments+="$dirname "
-        
+
         if [ -d "$dir" ] && [ "$dirname" == "$1" ]; then
             dirname_found=1
             print_header
@@ -38,35 +54,35 @@ main()
             space
             dirname_found=1
             index=0
-            
+
             for assignment in $dir/*; do
                 questions=$((questions+1))
                 score_false=0
                 assignment_name="$(basename "$assignment")"
                 test_name="$(ls $assignment/*.c | head -n 1)"
                 test_name="$(basename "$test_name")"
-                
+
                 if cc -Wall -Werror -Wextra -o test1 $(ls $assignment/*.c | head -n 1); then
                     rm test1
                     checks=$((checks+1))
                     passed=$((passed+1))
-                    
+
                     if [ -d "$assignment" ]; then
                         index2=0
-                        
+
                         for test in $assignment/*.c; do
                             ((index2++))
                             checks=$((checks+1))
-                            
+
                             if cc -o ${test%.c} $test 2> /dev/null; then
-                                
-                                if ./${test%.c} = 0; then
+
+                                if "${test%.c}" = 0; then
                                     passed=$((passed+1))
                                 else
                                     break_score=1
                                     score_false=1
                                 fi
-                                rm ${test%.c}
+                                rm "${test%.c}"
                             else
                                 printf "    ""${GREY}[$(($index2+1))] $test_error ${RED}FAILED${DEFAULT}\n"
                             fi
@@ -82,7 +98,7 @@ main()
                     printf "${RED}    $test_name cannot compile.${DEFAULT}\n"
                     printf "${BG_RED}${BOLD} FAIL ${DEFAULT}${PURPLE} $assignment_name/${DEFAULT}$test_name\n"
                     space
-                    
+
                     if [ $index -gt 0 ]; then
                         result+=", "
                     fi
@@ -93,7 +109,7 @@ main()
             break
         fi
     done
-    
+
     if [ $dirname_found = 0 ]; then
         printf "${RED}Sorry. Tests for $1 isn't available yet. Consider contributing at Github.${DEFAULT}\n"
         printf "Available assignment tests: ${PURPLE}$available_assignments${DEFAULT}\n"

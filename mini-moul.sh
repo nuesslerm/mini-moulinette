@@ -15,7 +15,7 @@ run_norm=false
 # Handle command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -n|-norm|--norminette)
+        -n|--norm|--norminette)
             run_norm=true
             shift
             ;;

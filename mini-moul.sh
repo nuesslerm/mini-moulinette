@@ -15,7 +15,7 @@ run_norm=false
 # Handle command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -n|--norminette)
+        -n|-norm|--norminette)
             run_norm=true
             shift
             ;;
@@ -42,21 +42,20 @@ detect_assignment() {
 # Run norminette if available
 run_norminette() {
   if command -v norminette &> /dev/null; then
-    echo "${BLUE}Running norminette checks...${DEFAULT}"
-    norminette
+    echo -e "${BLUE}Running norminette checks...${DEFAULT}"
+    norminette -R CheckForbiddenSourceHeader -R CheckDefine "$CURR_DIR"
   else
-    echo "${YELLOW}norminette not found, skipping norminette checks${DEFAULT}"
+    echo -e "${YELLOW}norminette not found, skipping norminette checks${DEFAULT}"
   fi
 }
 
 if detect_assignment; then
-  cp -R "$SCRIPT_DIR/mini-moul" "$CURR_DIR/mini-moul"
   if [ "$run_norm" = true ]; then
-    run_norminette
+    run_norminette || exit 1
   fi
+  cp -R "$SCRIPT_DIR/mini-moul" "$CURR_DIR/mini-moul"
   trap handle_sigint SIGINT
   "$CURR_DIR/mini-moul/test.sh" "$assignment"
-  # echo "$CURR_DIR/mini-moul"
   rm -rf "$CURR_DIR/mini-moul"
 else
   echo -e "${RED}Current directory does not match expected pattern (C[00~13]).${DEFAULT}\n"

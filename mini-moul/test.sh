@@ -28,19 +28,11 @@ main()
 {
     start_time=$(date +%s)
     
-    # Debug: Print the current directory and test directory path
-    echo "Current directory: $CURR_DIR"
-    echo "Looking in: $CURR_DIR/tests/"
-    
     # Check if tests directory exists
     if [ ! -d "$CURR_DIR/tests" ]; then
         printf "${RED}Error: tests directory not found in $CURR_DIR${DEFAULT}\n"
         exit 1
     fi
-    
-    # List contents of tests directory
-    echo "Contents of tests directory:"
-    ls -la "$CURR_DIR/tests"
     
     for dir in "$CURR_DIR"/tests/*; do
         dirname="$(basename "$dir")"

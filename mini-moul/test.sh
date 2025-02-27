@@ -27,13 +27,13 @@ dirname_found=0
 main()
 {
     start_time=$(date +%s)
-    
+
     # Check if tests directory exists
     if [ ! -d "$CURR_DIR/tests" ]; then
         printf "${RED}Error: tests directory not found in $CURR_DIR${DEFAULT}\n"
         exit 1
     fi
-    
+
     for dir in "$CURR_DIR"/tests/*; do
         dirname="$(basename "$dir")"
         echo "Found directory: $dirname"
@@ -68,7 +68,7 @@ main()
 
                             if cc -o ${test%.c} $test 2> /dev/null; then
 
-                                if "${test%.c}" = 0; then
+                                if "${test%.c}"; then
                                     passed=$((passed+1))
                                 else
                                     break_score=1

@@ -55,11 +55,18 @@ int main(void)
 
 int run_test(t_test test, int test_num)
 {
+  char cwd[1024];
+  if (getcwd(cwd, sizeof(cwd)) != NULL) {
+    printf("Current working directory: %s\n", cwd);
+  }
+
+  char *copy_program = "cp ex00/ft_print_program_name.c program_name.c";
+  printf("Attempting to copy from: %s/ex00/ft_print_program_name.c\n", cwd);
+
   fflush(stdout);
   char buf[1024];
   memset(buf, 0, sizeof(buf));
   char *program_name = "./program_name"; // Change this to your program name
-  char *copy_program = "cp ../ex00/ft_print_program_name.c program_name.c";
   char *compile_command = "cc -Wall -Werror -Wextra program_name.c -o program_name"; // Change this to the compile command for your program
   FILE *fp;
   int result;
